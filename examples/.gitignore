@@ -1,0 +1,9 @@
+build
+dist
+myproj
+myproj-out
+random
+random-out
+showtags
+*.o
+
