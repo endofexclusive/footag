@@ -67,7 +67,7 @@ linker symbol prefix.
 * `foot_`: performs calculations and generates geometry in an intermediate
    representation independent of the output format.
 * `geom_`: intermediate footprint representation.
-* `fout_`: API for transforming `geom` to EDA spcific output format.
+* `fout_`: API for transforming `geom` to EDA specific output format.
 
 ## `footag`
 This is the application interface to the library. A footprint is constructed
