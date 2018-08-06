@@ -54,6 +54,8 @@ struct fout_horizon_ctx {
         struct fout_ctx fout;
         struct footson_ctx packs;
         struct footlist gfxjunc;
+        double polyminx;
+        double polyminy;
         const char *name;
 };
 
@@ -301,8 +303,13 @@ static int emittexts(struct fout_horizon_ctx *ctx)
 {
         footson_addmember(&ctx->packs, "texts");
         footson_push(&ctx->packs, "{");
-        emittext(ctx, GEOM_LAYER_SILK, "$RD", 0, 0, 1.5, 0.15);
-        emittext(ctx, GEOM_LAYER_ASSY, "$RD", 0, 0, 1, 0);
+        {
+                /* place refdes outside courtyard */
+                double silkx = ceil(ctx->polyminx / 0.1) * 0.1;
+                double silky = floor((ctx->polyminy - 2.0 / 2) / 0.1) * 0.1;
+                emittext(ctx, GEOM_LAYER_SILK, "$RD", silkx, silky, 1.5, 0.15);
+                emittext(ctx, GEOM_LAYER_ASSY, "$RD", 0, 0, 1, 0);
+        }
         footson_pop(&ctx->packs, "}");
         return FOUT_OK;
 }
@@ -473,6 +480,8 @@ static int dopolyvertex(
         emitpos(&ctx->packs, mmtodev(x), mmtodev(y));
         footson_dostring(&ctx->packs, "type", type);
         footson_closeobj(&ctx->packs);
+        ctx->polyminx = fmin(ctx->polyminx, x);
+        ctx->polyminy = fmin(ctx->polyminy, y);
         return FOUT_OK;
 }
 
@@ -625,6 +634,8 @@ struct fout_ctx *fout_horizon_open(const char *dirname)
                 goto out;
         }
 
+        ctx->polyminx = 0;
+        ctx->polyminy = 0;
         footlist_init(&ctx->gfxjunc);
         footson_init(&ctx->packs);
         ctx->fout.ops = &THEOPS;
